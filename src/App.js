@@ -1,5 +1,5 @@
 import './App.css';
-import SubscriptionCard from './components/SubscriptionCard1'; // updated path
+import SubscriptionCard from './components/SubscriptionCard'; // updated path
 
 function App() {
   const currentPlan = "Basic"; // replace dynamically later

@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SubscriptionCard = ({ user }) => {
   const navigate = useNavigate();
   const [currentSubscription, setCurrentSubscription] = useState(null);
+  const [allPlans, setAllPlans] = useState([]);
   const [upgradePlans, setUpgradePlans] = useState([]);
   const [downgradePlans, setDowngradePlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Base API URL - adjust this to match your backend
+  const API_BASE = 'http://localhost:3000/api'; // Update with your backend URL
 
   // Fetch current subscription and available plans
   useEffect(() => {
@@ -17,27 +20,44 @@ const SubscriptionCard = ({ user }) => {
       try {
         setLoading(true);
         
-        // Fetch current subscription directly from supabase
-        const { data: subscriptionData, error: subscriptionError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .single();
-
-        if (subscriptionError && subscriptionError.code !== 'PGRST116') {
-          console.error('Error fetching subscription:', subscriptionError);
-          return;
+        // Fetch all available plans first
+        const plansResponse = await fetch(`${API_BASE}/plans`);
+        if (plansResponse.ok) {
+          const plansData = await plansResponse.json();
+          setAllPlans(plansData);
         }
-
-        if (subscriptionData) {
-          setCurrentSubscription(subscriptionData);
+        
+        // Fetch current subscription using your backend API
+        const subscriptionResponse = await fetch(`${API_BASE}/fetchSubscription/${user.id}`);
+        
+        if (subscriptionResponse.ok) {
+          const subscriptionData = await subscriptionResponse.json();
           
-          // Fetch upgrade and downgrade plans
-          await fetchPlansForUpgradeDowngrade(subscriptionData.current_plan);
+          // Find active subscription
+          const activeSubscription = subscriptionData.find(sub => 
+            sub.Status !== 'cancelled' && new Date(sub['End Date']) > new Date()
+          );
+          
+          if (activeSubscription) {
+            setCurrentSubscription(activeSubscription);
+            
+            // Get upgrade and downgrade plans
+            const currentPlan = activeSubscription.Subscription_Plans;
+            const currentPrice = currentPlan.price_per_month;
+            
+            const upgradeOptions = plansData.filter(plan => 
+              plan.price_per_month > currentPrice
+            );
+            const downgradeOptions = plansData.filter(plan => 
+              plan.price_per_month < currentPrice
+            );
+            
+            setUpgradePlans(upgradeOptions);
+            setDowngradePlans(downgradeOptions);
+          }
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching subscription data:', error);
       } finally {
         setLoading(false);
       }
@@ -48,47 +68,31 @@ const SubscriptionCard = ({ user }) => {
     }
   }, [user]);
 
-  // Fetch plans for upgrade/downgrade based on current plan
-  const fetchPlansForUpgradeDowngrade = async (currentPlan) => {
-    try {
-      // API call for upgrade plans (higher than current plan)
-      const { data: upgradeData, error: upgradeError } = await supabase
-        .rpc('get_upgrade_plans', { current_plan: currentPlan });
-
-      // API call for downgrade plans (lower than current plan)
-      const { data: downgradeData, error: downgradeError } = await supabase
-        .rpc('get_downgrade_plans', { current_plan: currentPlan });
-
-      if (upgradeError) console.error('Error fetching upgrade plans:', upgradeError);
-      else setUpgradePlans(upgradeData || []);
-
-      if (downgradeError) console.error('Error fetching downgrade plans:', downgradeError);
-      else setDowngradePlans(downgradeData || []);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-    }
-  };
-
   // Handle plan upgrade
-  const handleUpgrade = async (newPlan) => {
+  const handleUpgrade = async (targetPlanId) => {
     try {
       setActionLoading(true);
-      const { data, error } = await supabase
-        .rpc('upgrade_subscription', {
-          user_id: user.id,
-          subscription_id: currentSubscription.id,
-          new_plan: newPlan
-        });
+      
+      const response = await fetch(`${API_BASE}/upgrade/${currentSubscription['Subscription Id']}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          targetPlanId: targetPlanId
+        })
+      });
 
-      if (error) {
-        console.error('Error upgrading plan:', error);
-        alert('Failed to upgrade plan. Please try again.');
-      } else {
+      if (response.ok) {
         alert('Plan upgraded successfully!');
         window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to upgrade plan: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error upgrading plan:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setActionLoading(false);
@@ -96,25 +100,30 @@ const SubscriptionCard = ({ user }) => {
   };
 
   // Handle plan downgrade
-  const handleDowngrade = async (newPlan) => {
+  const handleDowngrade = async (targetPlanId) => {
     try {
       setActionLoading(true);
-      const { data, error } = await supabase
-        .rpc('downgrade_subscription', {
-          user_id: user.id,
-          subscription_id: currentSubscription.id,
-          new_plan: newPlan
-        });
+      
+      const response = await fetch(`${API_BASE}/downgrade/${currentSubscription['Subscription Id']}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          targetPlanId: targetPlanId
+        })
+      });
 
-      if (error) {
-        console.error('Error downgrading plan:', error);
-        alert('Failed to downgrade plan. Please try again.');
-      } else {
+      if (response.ok) {
         alert('Plan downgraded successfully!');
         window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to downgrade plan: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error downgrading plan:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setActionLoading(false);
@@ -125,22 +134,32 @@ const SubscriptionCard = ({ user }) => {
   const handleRenew = async (daysToExtend) => {
     try {
       setActionLoading(true);
-      const { data, error } = await supabase
-        .rpc('renew_subscription', {
-          user_id: user.id,
-          subscription_id: currentSubscription.id,
-          days_to_extend: daysToExtend
-        });
+      
+      // Calculate new end date
+      const currentEndDate = new Date(currentSubscription['End Date']);
+      const newEndDate = new Date(currentEndDate);
+      newEndDate.setDate(newEndDate.getDate() + daysToExtend);
+      
+      const response = await fetch(`${API_BASE}/renew/${currentSubscription['Subscription Id']}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          newEndDate: newEndDate.toISOString().split('T')[0] // Format as YYYY-MM-DD
+        })
+      });
 
-      if (error) {
-        console.error('Error renewing subscription:', error);
-        alert('Failed to renew subscription. Please try again.');
-      } else {
+      if (response.ok) {
         alert(`Subscription renewed for ${daysToExtend} days!`);
         window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to renew subscription: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error renewing subscription:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setActionLoading(false);
@@ -154,26 +173,39 @@ const SubscriptionCard = ({ user }) => {
 
     try {
       setActionLoading(true);
-      const { data, error } = await supabase
-        .rpc('cancel_subscription', {
-          user_id: user.id,
-          subscription_id: currentSubscription.id,
-          end_date: 0
-        });
+      
+      const response = await fetch(`${API_BASE}/cancel/${currentSubscription['Subscription Id']}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id
+        })
+      });
 
-      if (error) {
-        console.error('Error cancelling subscription:', error);
-        alert('Failed to cancel subscription. Please try again.');
-      } else {
+      if (response.ok) {
         alert('Subscription cancelled successfully!');
         navigate('/user/dashboard');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to cancel subscription: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error cancelling subscription:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   if (loading) {
@@ -240,14 +272,18 @@ const SubscriptionCard = ({ user }) => {
                 <h4 className="card-title">Current Subscription</h4>
                 <div className="row">
                   <div className="col-md-6">
-                    <p><strong>Plan:</strong> {currentSubscription.current_plan}</p>
+                    <p><strong>Plan:</strong> {currentSubscription.Subscription_Plans?.plan_name || 'N/A'}</p>
+                    <p><strong>Price:</strong> ₹{currentSubscription.Subscription_Plans?.price_per_month || 'N/A'}/month</p>
                     <p><strong>Status:</strong> 
-                      <span className="badge bg-success ms-2">{currentSubscription.status}</span>
+                      <span className={`badge ms-2 ${currentSubscription.Status === 'cancelled' ? 'bg-danger' : 'bg-success'}`}>
+                        {currentSubscription.Status || 'active'}
+                      </span>
                     </p>
                   </div>
                   <div className="col-md-6">
-                    <p><strong>Start Date:</strong> {new Date(currentSubscription.start_date).toLocaleDateString()}</p>
-                    <p><strong>End Date:</strong> {new Date(currentSubscription.end_date).toLocaleDateString()}</p>
+                    <p><strong>Start Date:</strong> {formatDate(currentSubscription['Start Date'])}</p>
+                    <p><strong>End Date:</strong> {formatDate(currentSubscription['End Date'])}</p>
+                    <p><strong>Last Renewed:</strong> {formatDate(currentSubscription['Last Renewed Date'])}</p>
                   </div>
                 </div>
               </div>
@@ -260,21 +296,21 @@ const SubscriptionCard = ({ user }) => {
                 <button
                   className="btn btn-warning btn-lg shadow-sm"
                   onClick={() => handleRenew(30)}
-                  disabled={actionLoading}
+                  disabled={actionLoading || currentSubscription.Status === 'cancelled'}
                 >
                   {actionLoading ? 'Processing...' : 'Renew for 30 Days'}
                 </button>
                 <button
                   className="btn btn-info btn-lg shadow-sm"
                   onClick={() => handleRenew(90)}
-                  disabled={actionLoading}
+                  disabled={actionLoading || currentSubscription.Status === 'cancelled'}
                 >
                   {actionLoading ? 'Processing...' : 'Renew for 90 Days'}
                 </button>
                 <button
                   className="btn btn-danger btn-lg shadow-sm"
                   onClick={handleCancel}
-                  disabled={actionLoading}
+                  disabled={actionLoading || currentSubscription.Status === 'cancelled'}
                 >
                   {actionLoading ? 'Processing...' : 'Cancel Subscription'}
                 </button>
@@ -282,7 +318,7 @@ const SubscriptionCard = ({ user }) => {
             </div>
 
             {/* Upgrade Plans */}
-            {upgradePlans.length > 0 && (
+            {upgradePlans.length > 0 && currentSubscription.Status !== 'cancelled' && (
               <div className="card shadow-sm mb-4">
                 <div className="card-body">
                   <h4 className="card-title mb-3">Upgrade Options</h4>
@@ -298,14 +334,14 @@ const SubscriptionCard = ({ user }) => {
                       </thead>
                       <tbody>
                         {upgradePlans.map((plan) => (
-                          <tr key={plan.id}>
-                            <td>{plan.name}</td>
-                            <td>₹{plan.price}</td>
-                            <td>{plan.description || 'Premium features included'}</td>
+                          <tr key={plan.plan_id}>
+                            <td>{plan.plan_name}</td>
+                            <td>₹{plan.price_per_month}/month</td>
+                            <td>{plan.features || 'Premium features included'}</td>
                             <td>
                               <button
                                 className="btn btn-success btn-sm"
-                                onClick={() => handleUpgrade(plan.name)}
+                                onClick={() => handleUpgrade(plan.plan_id)}
                                 disabled={actionLoading}
                               >
                                 {actionLoading ? 'Processing...' : 'Upgrade'}
@@ -321,7 +357,7 @@ const SubscriptionCard = ({ user }) => {
             )}
 
             {/* Downgrade Plans */}
-            {downgradePlans.length > 0 && (
+            {downgradePlans.length > 0 && currentSubscription.Status !== 'cancelled' && (
               <div className="card shadow-sm mb-4">
                 <div className="card-body">
                   <h4 className="card-title mb-3">Downgrade Options</h4>
@@ -339,8 +375,8 @@ const SubscriptionCard = ({ user }) => {
                         {downgradePlans.map((plan) => (
                           <tr key={plan.plan_id}>
                             <td>{plan.plan_name}</td>
-                            <td>₹{plan.price_per_month}</td>
-                            <td>{plan.description || 'Basic features included'}</td>
+                            <td>₹{plan.price_per_month}/month</td>
+                            <td>{plan.features || 'Basic features included'}</td>
                             <td>
                               <button
                                 className="btn btn-warning btn-sm"
