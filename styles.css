@@ -1,0 +1,245 @@
+:root{
+  --bg:#0f1724;
+  --card:#0b1220;
+  --accent:#06b6d4;
+  --muted:#99a3b3;
+  --glass: rgba(255,255,255,0.04);
+  --glass-2: rgba(255,255,255,0.02);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: linear-gradient(180deg,#071024,#081226 50%, #06111b);
+  color:#e6eef8;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding-bottom:40px;
+}
+
+.site-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  position:sticky;
+  top:0;
+  backdrop-filter: blur(6px);
+  z-index:30;
+}
+
+.brand h1{
+  margin:0;
+  font-size:20px;
+  letter-spacing:0.6px;
+}
+.brand span{color:var(--accent); margin-left:6px}
+
+.tag{color:var(--muted); font-size:12px; margin-top:4px}
+
+.top-nav{display:flex; gap:12px; align-items:center}
+.search{
+  padding:8px 12px;
+  border-radius:10px;
+  border:0;
+  min-width:260px;
+  outline:none;
+  background:var(--glass);
+  color:inherit;
+}
+.top-nav select{
+  padding:8px;
+  border-radius:8px;
+  border:0;
+  background:var(--glass);
+  color:inherit;
+}
+
+/* layout */
+.main{display:flex; gap:20px; padding:22px;}
+.filters{
+  width:260px;
+  padding:18px;
+  border-radius:14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.03);
+  height:calc(100vh - 120px);
+  position:sticky;
+  top:72px;
+}
+.filter-group{margin-bottom:14px; color:var(--muted); font-size:14px}
+.filter-group label{display:block; margin:8px 0; cursor:pointer}
+
+.num{width:100px; padding:6px; background:var(--glass-2); border-radius:8px; border:0; color:inherit}
+
+.btn{margin-top:6px;padding:10px 12px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent),#7ee7f5);color:#042024;cursor:pointer;font-weight:600}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+
+/* cards area */
+.browse-section{flex:1}
+.section-title{margin:0 0 12px 0}
+.cards-wrap{
+  display:flex;
+  gap:20px;
+  padding:18px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+  perspective:1200px;
+  -webkit-overflow-scrolling:touch;
+  min-height:420px;
+  align-items:flex-start;
+  padding-bottom:40px;
+}
+
+/* plan card */
+.plan-card{
+  width:280px;
+  min-width:280px;
+  height:360px;
+  border-radius:18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.04);
+  padding:18px;
+  transform-style:preserve-3d;
+  transition: transform 300ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms;
+  box-shadow: 0 6px 18px rgba(3,8,15,0.6);
+  position:relative;
+  cursor:grab;
+  user-select:none;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  opacity:0;
+  transform: translateY(30px) scale(0.98);
+}
+
+/* card inner content */
+.plan-top{display:flex; justify-content:space-between; align-items:start}
+.badge{background: rgba(6,182,212,0.12); color:var(--accent); padding:6px 8px; border-radius:10px; font-weight:700; font-size:12px}
+.plan-name{font-size:18px; font-weight:700}
+.plan-meta{color:var(--muted); font-size:13px}
+
+.plan-hero{margin-top:12px; font-size:34px; font-weight:800}
+.small{font-size:14px; color:var(--muted)}
+
+.plan-features{margin-top:12px; display:flex; flex-direction:column; gap:6px}
+.feature{display:flex; justify-content:space-between; font-size:14px; color:var(--muted)}
+
+.plan-actions{display:flex; gap:10px; align-items:center}
+.btn-sub{flex:1;padding:10px;border-radius:10px;background:linear-gradient(90deg,#10b981,#06b6d4);border:0;color:#042024;font-weight:700;cursor:pointer}
+.btn-ghost{padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
+
+/* reveal animation state when visible */
+.plan-card.revealed{
+  opacity:1;
+  transform: translateY(0) scale(1);
+}
+
+/* hover */
+.plan-card:hover{
+  transform: translateY(-8px) scale(1.03) rotateX(2deg);
+  box-shadow: 0 18px 40px rgba(2,6,22,0.7);
+}
+
+/* discounted ribbon */
+.ribbon{
+  position:absolute;
+  right:14px;
+  top:14px;
+  background:linear-gradient(90deg,#ff7ab6,#ffb86b);
+  padding:6px 10px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:12px;
+  color:#071025;
+}
+
+/* Top navigation container */
+.top-nav {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background-color: #111; /* dark nav background */
+  align-items: center;
+}
+
+/* Search input */
+.top-nav .search {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background-color: #222; /* dark input background */
+  color: #fff; /* white text */
+}
+
+/* Dropdown select */
+.top-nav #sort {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background-color: #222; /* dark dropdown background */
+  color: #fff; /* white text */
+  appearance: none; /* remove default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+/* Dropdown options */
+.top-nav #sort option {
+  background-color: #333; /* option background */
+  color: #fff; /* option text */
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+/* Optional: add a small arrow to dropdown */
+.top-nav #sort::after {
+  content: "▼";
+  margin-left: 8px;
+  pointer-events: none;
+}
+
+/* "Pop" effect when buttons are clicked */
+.btn:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease-out;
+}
+
+
+/* empty state */
+.empty{padding:40px;text-align:center;color:var(--muted)}
+
+/* responsive */
+@media (max-width:900px){
+  .filters{display:none}
+  .cards-wrap{padding-left:18px}
+}
+
+/* Animation for cards to "pop" into view */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.card.pop-in {
+  animation: pop-in 0.4s ease-out forwards;
+}

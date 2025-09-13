@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Browse Subscription</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <h1>Subscription Plans<span>+</span></h1>
+      <p class="tag">Find the best broadband & add-ons</p>
+    </div>
+
+    <nav class="top-nav">
+      <input id="search" class="search" placeholder="Search plans (e.g. 'Fibernet')" />
+      <select id="sort">
+        <option value="popular">Sort: Most Popular</option>
+        <option value="price-asc">Price: Low → High</option>
+        <option value="price-desc">Price: High → Low</option>
+        <option value="speed-desc">Speed: High → Low</option>
+      </select>
+    </nav>
+  </header>
+
+  <main class="main">
+    <aside class="filters">
+      <h3>Filters</h3>
+
+      <div class="filter-group">
+        <label>Price range (₹):</label>
+        <div class="range-values">
+          <input type="number" id="minPrice" class="num" value="0" />
+          <span>—</span>
+          <input type="number" id="maxPrice" class="num" value="2000" />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Speed</label>
+        <label><input type="checkbox" name="speed" value="0-50" /> 0–50 Mbps</label>
+        <label><input type="checkbox" name="speed" value="50-200" /> 50–200 Mbps</label>
+        <label><input type="checkbox" name="speed" value="200-500" /> 200–500 Mbps</label>
+        <label><input type="checkbox" name="speed" value="500-9999" /> 500+ Mbps</label>
+      </div>
+
+      <div class="filter-group">
+        <label>Plan Type</label>
+        <label><input type="checkbox" name="type" value="Fibernet" /> Fibernet</label>
+        <label><input type="checkbox" name="type" value="Copper" /> Broadband Copper</label>
+        <label><input type="checkbox" name="type" value="OTT" /> OTT Add-on</label>
+      </div>
+
+      <div class="filter-group">
+        <label><input id="onlyDiscount" type="checkbox" /> Show only discounted plans</label>
+      </div>
+
+      <div style="margin-top:12px">
+        <button id="applyFilters" class="btn">Apply</button>
+        <button id="resetFilters" class="btn ghost">Reset</button>
+      </div>
+    </aside>
+
+    <section class="browse-section">
+      <h2 class="section-title">Browse Plans</h2>
+
+      <div id="cardsWrap" class="cards-wrap" tabindex="0">
+    <div class="card-actions">
+      <button type="button" class="btn subscribe-btn">Subscribe</button>
+      <button type="button" class="btn ghost details-btn">Details</button>
+    </div>
+  </div>
+
+
+      <div id="emptyMessage" class="empty" hidden>
+        No plans match your filters. Try relaxing filters.
+      </div>
+    </section>
+  </main>
+    
+<footer style="text-align: center; padding: 20px; background-color: #111; color: #fff;">
+  &copy; 2025 Subscription Managment System. All Rights Reserved.
+</footer>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
