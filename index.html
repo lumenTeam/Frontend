@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Manage Plans (Admin)</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Plans </h1>
+        
+        <button id="backButton" class="back-button">Back</button>
+
+        <div class="form-container">
+            <h2>Add New Plan</h2>
+            <form id="planForm">
+                <input type="text" id="name" placeholder="Plan Name" required />
+                <input type="number" id="price" placeholder="Price (₹)" required />
+                <input type="number" id="quota" placeholder="Quota (GB)" required />
+                <button type="submit">Add Plan</button>
+            </form>
+        </div>
+
+        <div class="search-sort">
+            <input type="text" id="searchInput" placeholder="Search by Name, Price, Quota" />
+            <button onclick="sortPlans('price')">Sort by Price</button>
+            <button onclick="sortPlans('quota')">Sort by Quota</button>
+        </div>
+
+        <div class="plans-container">
+            <h2>Plans</h2>
+            <table id="plansTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quota</th>
+                        <th>Status</th>
+                        <th>Subscribers</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Plans will be shown here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

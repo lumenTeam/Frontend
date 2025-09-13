@@ -1,0 +1,131 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F8FAFC;
+    color: #1E293B;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #0066CC;
+    margin-bottom: 10px;
+}
+
+.back-button {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.back-button:hover {
+    background-color: #333;
+}
+
+h2 {
+    color: #00B4D8;
+}
+
+.form-container, .plans-container {
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #0066CC;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #004C99;
+}
+
+.search-sort {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-sort input {
+    width: 200px;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.search-sort button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #00B4D8;
+    color: white;
+    cursor: pointer;
+}
+
+.search-sort button:hover {
+    background-color: #0091A3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #00B4D8;
+    color: white;
+}
+
+table td button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background-color: #90E0EF;
+    color: #1E293B;
+}
+
+.btn-delete {
+    background-color: #FF006E;
+    color: white;
+}
+
+.btn-toggle {
+    background-color: #06FFA5;
+    color: #1E293B;
+}
